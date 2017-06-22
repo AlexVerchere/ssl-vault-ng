@@ -10,10 +10,10 @@
 
 
 include_recipe 'chef-vault'
-include_recipe 'ssl-vault::certificate_directory'
-include_recipe 'ssl-vault::private_key_directory'
-include_recipe 'ssl-vault::certificate_file'
-include_recipe 'ssl-vault::private_key_file'
-include_recipe 'ssl-vault::pem_file'
-include_recipe 'ssl-vault::combined_chain_file'
-include_recipe 'ssl-vault::combined_chain_pem_file'
+include_recipe 'ssl-vault-ng::certificate_directory'
+include_recipe 'ssl-vault-ng::private_key_directory'
+include_recipe 'ssl-vault-ng::certificate_file'
+include_recipe 'ssl-vault-ng::private_key_file'
+include_recipe 'ssl-vault-ng::pem_file'
+include_recipe 'ssl-vault-ng::combined_chain_file'
+include_recipe 'ssl-vault-ng::combined_chain_pem_file'

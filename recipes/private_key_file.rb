@@ -10,31 +10,34 @@
 
 
 include_recipe 'chef-vault'
-include_recipe 'ssl-vault::private_key_directory'
+include_recipe 'ssl-vault-ng::private_key_directory'
 
 
-node['ssl-vault']['certificates'].each do |cert_name, cert|
-  clean_name = cert_name.gsub(
+node['ssl-vault']['certificates'].each do |cert_name, info|
+    clean_name = cert_name.gsub(
     node['ssl-vault']['data_bag_key_rex'],
     node['ssl-vault']['data_bag_key_replacement_str']
-  )
-  vault_item = chef_vault_item('ssl-vault', clean_name)
-
-  private_key = if node['ssl-vault']['private_key_file']
-    node['ssl-vault']['private_key_file']
-  else
-    File.join(
-      node['ssl-vault']['private_key_directory'],
-      [cert_name, 'key'].join('.')
     )
-  end
+    vault_item = chef_vault_item('ssl-vault', clean_name)
 
-  file private_key do
-    content vault_item['key']
-    owner 'root'
-    group node['ssl-vault']['cert_group']
-    mode '0440'
-  end
+    private_key = if info['private_key_file']
+        File.join(
+        node['ssl-vault']['private_key_directory'],
+        info['private_key_file']
+        )
+    else
+        File.join(
+        node['ssl-vault']['private_key_directory'],
+        [cert_name, 'key'].join('.')
+        )
+    end
 
-  node.set['ssl-vault']['certificate'][cert_name]['private_key_file'] = private_key
+    file private_key do
+        content vault_item['key']
+        owner 'root'
+        group node['ssl-vault']['cert_group']
+        mode '0440'
+    end
+
+    node.set['ssl-vault']['certificate'][cert_name]['private_key_file'] = private_key
 end

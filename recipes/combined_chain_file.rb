@@ -10,38 +10,41 @@
 
 
 include_recipe 'chef-vault'
-include_recipe 'ssl-vault::certificate_directory'
+include_recipe 'ssl-vault-ng::certificate_directory'
 
 
-node['ssl-vault']['certificates'].each do |cert_name, cert|
-  clean_name = cert_name.gsub(
+node['ssl-vault']['certificates'].each do |cert_name, info|
+    clean_name = cert_name.gsub(
     node['ssl-vault']['data_bag_key_rex'],
     node['ssl-vault']['data_bag_key_replacement_str']
-  )
-  vault_item = chef_vault_item('ssl-vault', clean_name)
+    )
+    vault_item = chef_vault_item('ssl-vault', clean_name)
 
-  if vault_item.key?('chain_certificates') and vault_item['chain_certificates']
+    if vault_item.key?('chain_certificates') and vault_item['chain_certificates']
 
-    combined_chain_file = if node['ssl-vault']['combined_chain_file']
-      node['ssl-vault']['combined_chain_file']
-    else
-      File.join(
-        node['ssl-vault']['certificate_directory'],
-        [cert_name, 'combined', 'cert'].join('.')
-      )
+        combined_chain_file = if info["combined_chain_file"]
+            File.join(
+            node['ssl-vault']['certificate_directory'],
+            info["combined_chain_file"]
+            )
+        else
+            File.join(
+            node['ssl-vault']['certificate_directory'],
+            [cert_name, 'combined', 'cert'].join('.')
+            )
+        end
+
+        template combined_chain_file do
+            source 'combined.cert.erb'
+            owner 'root'
+            group 'root'
+            mode '0644'
+            variables(
+            :certificate => vault_item['certificate'],
+            :chain_certificates => vault_item['chain_certificates']
+            )
+        end
+
+        node.set['ssl-vault']['certificate'][cert_name]['combined_chain_file'] = combined_chain_file
     end
-
-    template combined_chain_file do
-      source 'combined.cert.erb'
-      owner 'root'
-      group 'root'
-      mode '0644'
-      variables(
-        :certificate => vault_item['certificate'],
-        :chain_certificates => vault_item['chain_certificates']
-      )
-    end
-
-    node.set['ssl-vault']['certificate'][cert_name]['combined_chain_file'] = combined_chain_file
-  end
 end
