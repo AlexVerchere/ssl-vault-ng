@@ -44,7 +44,5 @@ node['ssl-vault']['certificates'].each do |cert_name, info|
             :chain_certificates => vault_item['chain_certificates']
             )
         end
-
-        node.set['ssl-vault']['certificate'][cert_name]['combined_chain_file'] = combined_chain_file
     end
 end

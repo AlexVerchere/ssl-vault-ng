@@ -38,6 +38,4 @@ node['ssl-vault']['certificates'].each do |cert_name, info|
         group 'root'
         mode '0644'
     end
-
-    node.set['ssl-vault']['certificate'][cert_name]['certificate_file'] = certificate_file
 end
