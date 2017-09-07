@@ -20,7 +20,7 @@ node['ssl-vault']['certificates'].each do |cert_name, info|
   )
   vault_item = chef_vault_item('ssl-vault', clean_name)
 
-  pem_file = if info['pem_file']
+  pem_file = if info && info['pem_file']
     info['pem_file']
   else
     File.join(
