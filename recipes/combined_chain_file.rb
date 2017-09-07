@@ -22,7 +22,7 @@ node['ssl-vault']['certificates'].each do |cert_name, info|
 
     if vault_item.key?('chain_certificates') and vault_item['chain_certificates']
 
-        combined_chain_file = if info["combined_chain_file"]
+        combined_chain_file = if info && info["combined_chain_file"]
             File.join(
             node['ssl-vault']['certificate_directory'],
             info["combined_chain_file"]
